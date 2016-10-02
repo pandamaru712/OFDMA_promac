@@ -7,5 +7,5 @@
 void calculateRSSI(apInfo*, staInfo*, double*);
 double distance(apInfo*, staInfo*, int, int);
 void calculateDelay(apInfo*, staInfo*, double*);
-void calculatePhyRate(apInfo*, staInfo*, int*, int*);
+void calculatePhyRate(apInfo*, staInfo*, int*, int*, int*);
 #endif
