@@ -11,10 +11,11 @@
 
 
 #define BUFFER_SIZE 200
-#define NUM_STA 50
+#define NUM_STA 10
 #define EP_BUFFER_SIZE 2048
 #define STR_MAX 256
 #define CONFIG_FILE "config.txt"
+#define NUM_MULTIPLEX 2
 
 #ifdef SHOW_PROCESS
 #define processPrintf printf
