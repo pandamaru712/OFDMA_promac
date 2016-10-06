@@ -27,13 +27,14 @@ FILE *gFileTopology;
 Engine *gEp;
 double r[(NUM_STA+1)*(NUM_STA+1)*(NUM_STA+1)] = {};//{-1, -4, -45, -51, -29, -42, -16, -1, -25, -39, -24, -35, -3, -23, -1, -56, -78, -10, -11, -34, -22, -1, -7, -67, -45, -23, -65, -55, -1, -76, -12, -6, -95, -67, -52, -1};
 double pro[NUM_STA+1][NUM_STA+1][NUM_STA+1];
-double dummyA[NUM_STA*2][(NUM_STA+1)*(NUM_STA+1)];
+double dummyA[NUM_STA*2][(NUM_STA+1)*(NUM_STA+1)*(NUM_STA+1)];
 double A[NUM_STA*2][(NUM_STA+1)*(NUM_STA+1)*(NUM_STA+1)];
 double u[NUM_STA*2];
 double dummyAeq[2][(NUM_STA+1)*(NUM_STA+1)*(NUM_STA+1)];
 double Aeq[2][(NUM_STA+1)*(NUM_STA+1)*(NUM_STA+1)];
 double beq[2] = {100, 0};
 double lb[(NUM_STA+1)*(NUM_STA+1)*(NUM_STA+1)] = {};
+double ub[(NUM_STA+1)*(NUM_STA+1)*(NUM_STA+1)] = {};
 
 void showProgression(int*);
 
