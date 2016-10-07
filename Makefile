@@ -6,7 +6,7 @@ OBJDIR = ./objects
 LIBDIR = -L/Applications/MATLAB_R2015b.app/bin/maci64
 
 PROG := OFDMA_promac
-SRCS := main.c bufferManager.c frameGen.c idle.c initialization.c result.c success.c setting.c probability.c perModel.c
+SRCS := main.c bufferManager.c frameGen.c initialization.c result.c success.c setting.c probability.c perModel.c
 OBJS := $(addprefix $(OBJDIR)/, $(SRCS:%.c=%.o))
 DEPS := $(SRCS:%.c=%.d)
 LIBS := -leng -lmx

@@ -106,7 +106,8 @@ void initializeNodeInfo(staInfo sta[], apInfo* ap){
 		sta[i].afterColl = 0;
 		sta[i].fSuccNow = false;
 		sta[i].afterSucc = 0;
-		sta[i].fTx = false;
+		sta[i].fTxOne = false;
+		sta[i].fTxSecond = false;
 		//sta[i].sumFrameLengthInBuffer = 0;
 		sta[i].sumDelay = 0.0;
 		if(gSpec.position==0){

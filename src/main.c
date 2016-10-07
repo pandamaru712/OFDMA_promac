@@ -7,7 +7,6 @@
 #include "setting.h"
 #include "initialization.h"
 #include "success.h"
-#include "idle.h"
 #include "result.h"
 #include "macro.h"
 #include "probability.h"
