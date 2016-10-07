@@ -151,7 +151,7 @@ void initializeMatrix(){
 
 	for(i=0; i<NUM_STA; i++){
 		for(j=0; j<yoko; j++){
-			if((j/(NUM_STA+1)==i+1)&&(j%(NUM_STA+1)!=i+1)){
+			if(((j%(int)pow(NUM_STA+1,2))/(NUM_STA+1)==i+1)&&((j%(int)pow(NUM_STA+1,2))%(NUM_STA+1)!=i+1)){
 				dummyA[i][j] = -1;
 			}else{
 				dummyA[i][j] = 0;
@@ -162,7 +162,9 @@ void initializeMatrix(){
 	}
 	for(i=NUM_STA; i<NUM_STA*2; i++){
 		for(j=0; j<yoko; j++){
-			if((j%(NUM_STA+1)==(i-NUM_STA+1))&&(j/(NUM_STA+1)!=(i-NUM_STA+1))){
+			if(((j%(int)pow(NUM_STA+1,2))%(NUM_STA+1)==(i-NUM_STA+1))&&((j%(int)pow(NUM_STA+1,2))/(NUM_STA+1)!=(i-NUM_STA+1))){
+				dummyA[i][j] = -1;
+			}else if(j/(int)pow(NUM_STA+1,2)==i-NUM_STA+1 && (j%(int)pow(NUM_STA+1,2))%(NUM_STA+2)!=0){
 				dummyA[i][j] = -1;
 			}else{
 				dummyA[i][j] = 0;
@@ -185,7 +187,7 @@ void initializeMatrix(){
 	tate = 2;
 
 	for(j=0; j<yoko; j++){
-		if(j/(NUM_STA+1)==j%(NUM_STA+1)){
+		if((j%(int)pow(NUM_STA+1,2))/(NUM_STA+1)==(j%(int)pow(NUM_STA+1,2))%(NUM_STA+1)){
 			dummyAeq[1][j] = 1;
 		}else{
 			dummyAeq[0][j] = 1;
