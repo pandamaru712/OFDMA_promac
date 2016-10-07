@@ -227,7 +227,7 @@ void initializeMatrix(){
 	}
 }
 
-int selectNode(apInfo *ap, staInfo sta[], bool *fUpColl, bool *fNoUplink, bool *fNoDownlink, int *upNode, int *downNode){
+int selectNode(apInfo *ap, staInfo sta[], bool *fUpCollOne, bool *fUpCollSecond, bool *fNoUpOne, bool *fNoUpSecond, bool *fNoDownlink, int *upNodeOne, int *upNodeSecond, int *downNode){
 	double *proDown;
 	proDown = (double*)malloc(sizeof(double)*(NUM_STA+1));// = {};
 	double *proUp;
@@ -236,52 +236,23 @@ int selectNode(apInfo *ap, staInfo sta[], bool *fUpColl, bool *fNoUplink, bool *
 	proTempDown = (double*)malloc(sizeof(double)*(NUM_STA+1));// = {};   //確率判定のため
 	//int upNode, downNode;   //0がなし．1--NUM_STAまで．配列とずれてるから注意．
 	double downRand;
-	int i, j;
-	int numTx = 0;
-	int minBackoff = INT_MAX;
+	int i, j, k;
+	int minBackoffOne = INT_MAX;
+	int minBackoffSecond = INT_MAX;
+	int minMinBackoff;
 	int dummyNode = INT_MAX;
-	int nodeIdRandom;
+	//int nodeIdRandom;
+	double *tempUp;
+	tempUp = (double*)malloc(sizeof(double)*(NUM_STA+1));
+	int numUpOne = 0;
+	int numUpSecond = 0;
 
 	//配列の初期化
 	initializeDoubleArray(proDown, NUM_STA+1, 0);
 	initializeDoubleArray(proUp, NUM_STA+1, 0);
 	initializeDoubleArray(proTempDown, NUM_STA+1, 0);
 
-	if(gSpec.proMode==7){
-		nodeIdRandom = rand() % (NUM_STA + 1);
-		if(nodeIdRandom==0){
-			*upNode = 0;
-			*fNoUplink = true;
-			nodeIdRandom = rand() % NUM_STA;
-			for(i=0; i<NUM_STA; i++){
-				if(i==nodeIdRandom){
-					*downNode = i + 1;
-					sta[i].fTx = false;
-					sta[i].fRx = true;
-				}else{
-					sta[i].fTx = false;
-					sta[i].fRx = false;
-				}
-			}
-		}else{
-			*downNode = 0;
-			*fNoDownlink = true;
-			for(i=0; i<NUM_STA; i++){
-				if(i==nodeIdRandom-1){
-					sta[i].fTx = true;
-					sta[i].fRx = false;
-					*upNode = nodeIdRandom;
-					numTx++;
-				}else{
-					sta[i].fTx = false;
-					sta[i].fRx = false;
-				}
-			}
-		}
-		goto ENDHALF;
-	}
-
-	if(gSpec.proMode==6){
+	/*if(gSpec.proMode==6){
 		nodeIdRandom = rand() % (NUM_STA+1);
 		for(i=1; i<=NUM_STA; i++){
 			if(nodeIdRandom==0){
@@ -299,7 +270,7 @@ int selectNode(apInfo *ap, staInfo sta[], bool *fUpColl, bool *fNoUplink, bool *
 			}
 		}
 		goto HALF;
-	}
+	}*/
 
 	//下り通信を受信する端末の決定
 	selectionPrintf("***** Probability that each node is selected as a destination node of AP. *****\n");
@@ -308,7 +279,9 @@ int selectNode(apInfo *ap, staInfo sta[], bool *fUpColl, bool *fNoUplink, bool *
 			proTempDown[i] += proTempDown[i-1];
 		}
 		for(j=0; j<NUM_STA+1; j++){
-			proDown[i] += pro[i][j];
+			for(k=0; k<NUM_STA+1; k++){
+				proDown[i] += pro[i][j][k];
+			}
 		}
 		proTempDown[i] += proDown[i];
 		selectionPrintf("p_d[%d] is %f.\n", i, proTempDown[i]);
@@ -341,8 +314,8 @@ int selectNode(apInfo *ap, staInfo sta[], bool *fUpColl, bool *fNoUplink, bool *
 		}
 	}
 
-	HALF:
-	if(gSpec.proMode==6){
+	//HALF:
+	/*if(gSpec.proMode==6){
 		do{
 			nodeIdRandom = rand() % (NUM_STA+1);
 		}while(nodeIdRandom==*downNode);
@@ -365,23 +338,28 @@ int selectNode(apInfo *ap, staInfo sta[], bool *fUpColl, bool *fNoUplink, bool *
 			}
 		}
 		goto ENDHALF;
-	}
+	}*/
 
 	//上り通信端末の選択
 	selectionPrintf("***** Probabiliy that each node is selected as a source node of AP. *****\n");
 	for(j=0; j<NUM_STA+1; j++){
+		for(k=0; k<NUM_STA+1; k++){
+			tempUp[j] = pro[*downNode][j][k];
+		}
+	}
+	for(j=0; j<NUM_STA+1; j++){
 		if(*downNode==j){
 			proUp[j] = 0;
 		}else{
-			proUp[j] = pro[*downNode][j]/proDown[*downNode];
+			proUp[j] = tempUp[j]/proDown[*downNode];
 			//if(proUp[j]<0.000001){
-				selectionPrintf("%f, %f ", pro[*downNode][j], proDown[*downNode]);
+				selectionPrintf("%f, %f ", tempUp[j], proDown[*downNode]);
 			//}*/
 		}
 		selectionPrintf("p_u[%d] is %f\n", j, proUp[j]);
 	}
 	selectionPrintf("\n\n");
-	int temp = 0;
+
 	for(i=0; i<NUM_STA+1; i++){
 		if(proUp[i]!=0){
 			if(i==0){
@@ -390,78 +368,156 @@ int selectNode(apInfo *ap, staInfo sta[], bool *fUpColl, bool *fNoUplink, bool *
 				sta[i-1].cw = (int)(1/proUp[i]);
 				sta[i-1].backoffCount = rand() % (sta[i-1].cw+1);
 				selectionPrintf("%f, %d ", proUp[i], sta[i-1].backoffCount);
-				temp++;
 			}
 		}
 		if(i!=0){
 			selectionPrintf("%d, ", sta[i-1].cw);
 		}
 	}
-	selectionPrintf("%d, ", temp);
+	selectionPrintf("%d, ", numUpOne);
 	selectionPrintf("\n\n");
 
-	bool empty = true;
+	bool emptyOne = true;
 
 	for(i=0; i<gSpec.numSta; i++){
 		if(sta[i].buffer[0].lengthMsdu!=0){
-			empty = false;
+			emptyOne = false;
 		}
 		if(proUp[i+1]!=0){
-			if((minBackoff>sta[i].backoffCount)&&(sta[i].buffer[0].lengthMsdu!=0)){
-				minBackoff = sta[i].backoffCount;
+			if((minBackoffOne>sta[i].backoffCount)&&(sta[i].buffer[0].lengthMsdu!=0)){
+				minBackoffOne = sta[i].backoffCount;
 			}
 		}
 	}
-	selectionPrintf("%d, ", minBackoff);
-	if(minBackoff==INT_MAX&&empty==true){
-		printf("All STAs don't have a frame.\n");   //フレームが無いときだけじゃないかも ダミーが選ばれる場合も
+	selectionPrintf("minBackoffOne %d, ", minBackoffOne);
+	if(minBackoffOne==INT_MAX&&emptyOne==true){
+		printf("All STAs don't have a frame.(epmtyOne)\n");   //フレームが無いときだけじゃないかも ダミーが選ばれる場合も
 	}
-	if(dummyNode<minBackoff){
-		minBackoff = dummyNode;
-		*fNoUplink = true;
-		*upNode = 0;
-		calculatePhyRate(ap, sta, upNode, downNode);
-	}else{
-		if(*fNoUplink==false){
-			for(i=0; i<gSpec.numSta; i++){
-				if(proUp[i+1]!=0 && minBackoff==sta[i].backoffCount && sta[i].fRx==false){
-					sta[i].fTx = true;
-					//sta[i].backoffCount = rand() % (sta[i].cw + 1);
-					numTx++;
-					*upNode = i+1;
-					calculatePhyRate(ap, sta, upNode, downNode);
-					selectionPrintf("STA %d has minimum backoff count.\n", i);
-				}else{
-					//sta[i].backoffCount -= minBackoff;
-					sta[i].fTx = false;
-				}
-			}
+	if(dummyNode<minBackoffOne){
+		minBackoffOne = dummyNode;
+		*upNodeOne = 0;
+		*fNoUpOne = true;
+	}
+
+	//Select STA k
+	for(k=0; k<NUM_STA+1; k++){
+		for(j=0; j<NUM_STA+1; j++){
+			tempUp[k] = pro[*downNode][j][k];
+		}
+	}
+	for(k=0; k<NUM_STA+1; k++){
+		if(*downNode==k){
+			proUp[k] = 0;
 		}else{
-			sta[i].fTx = false;
+			proUp[k] = tempUp[k]/proDown[*downNode];
+			//if(proUp[j]<0.000001){
+				selectionPrintf("%f, %f ", tempUp[k], proDown[*downNode]);
+			//}*/
+		}
+		selectionPrintf("p_u[%d] is %f\n", k, proUp[k]);
+	}
+	selectionPrintf("\n\n");
+
+	for(i=0; i<NUM_STA+1; i++){
+		if(proUp[i]!=0){
+			if(i==0){
+				dummyNode = rand() % ((int)(1/proUp[i])+1);
+			}else{
+				sta[i-1].cw = (int)(1/proUp[i]);
+				sta[i-1].backoffCount = rand() % (sta[i-1].cw+1);
+				selectionPrintf("%f, %d ", proUp[i], sta[i-1].backoffCount);
+			}
+		}
+		if(i!=0){
+			selectionPrintf("%d, ", sta[i-1].cw);
 		}
 	}
-	selectionPrintf("%d, ", numTx);
+	selectionPrintf("%d, ", numUpSecond);
+	selectionPrintf("\n\n");
 
-	ENDHALF:
-	if(numTx==0 && *fNoUplink==false){
-		printf("undefined\n");
-	}else if(numTx==0 && *fNoUplink==true){
-		*fUpColl = false;
-	}else if(numTx==1){
-		*fUpColl = false;
-	}else{
-		*fUpColl = true;
-		printf("\ncollision\n");
+	bool emptySecond = true;
+
+	for(i=0; i<gSpec.numSta; i++){
+		if(sta[i].buffer[0].lengthMsdu!=0){
+			emptySecond = false;
+		}
+		if(proUp[i+1]!=0){
+			if((minBackoffSecond>sta[i].backoffCount)&&(sta[i].buffer[0].lengthMsdu!=0)){
+				minBackoffSecond = sta[i].backoffCount;
+			}
+		}
 	}
-	selectionPrintf("(%d, %d),", *downNode, *upNode);
+	selectionPrintf("minBackoffSecond %d, ", minBackoffSecond);
+	if(minBackoffSecond==INT_MAX&&emptySecond==true){
+		printf("All STAs don't have a frame.(emptySecond)\n");   //フレームが無いときだけじゃないかも ダミーが選ばれる場合も
+	}
+	if(dummyNode<minBackoffSecond){
+		minBackoffSecond = dummyNode;
+		*upNodeSecond = 0;
+		*fNoUpSecond = true;
+	}
 
-	if(numTx==1){
-		printf("\n(%d, %d),\n", *downNode, *upNode);
+	if(*upNodeOne==0 && *upNodeSecond==0){
+		calculatePhyRate(ap, sta, upNodeOne, upNodeSecond, downNode);
+	}else{
+		for(i=0; i<gSpec.numSta; i++){
+			if(proUp[i+1]!=0 && sta[i].backoffCount == minBackoffOne && sta[i].fRx==false){
+				sta[i].fTxOne = true;
+				//sta[i].backoffCount = rand() % (sta[i].cw + 1);
+				numUpOne++;
+				*upNodeOne = i+1;
+				*fNoUpOne = false;
+				//calculatePhyRate(ap, sta, upNode, downNode);
+				selectionPrintf("STA %d has minimum backoff count.\n", i);
+			}else if(proUp[i+1]!=0 && sta[i].backoffCount == minBackoffSecond && sta[i].fRx==false){
+				sta[i].fTxSecond = true;
+				//sta[i].backoffCount = rand() % (sta[i].cw + 1);
+				numUpSecond++;
+				*upNodeSecond = i+1;
+				*fNoUpSecond = false;
+			}else{
+				//sta[i].backoffCount -= minBackoff;
+				sta[i].fTxOne = false;
+				sta[i].fTxSecond = false;
+			}
+		}
+		calculatePhyRate(ap, sta, upNodeOne, upNodeSecond, downNode);
+	}
+	selectionPrintf("numUpOne %d, numUpSecond %d\n", numUpOne, numUpSecond);
+
+	//ENDHALF:
+	if((numUpOne==0 && *fNoUpOne==false) || (numUpSecond==0 && *fNoUpSecond==false)){
+		printf("undefined\n");
+	}
+	if((numUpOne==0 && *fNoUpOne==true)||(numUpOne==1 && *fNoUpOne==false)){
+		*fUpCollOne = false;
+	}
+	if((numUpSecond==0 && *fNoUpSecond==true)||(numUpSecond==1 && *fNoUpSecond==false)){
+		*fUpCollSecond = false;
+	}
+	if(numUpOne>1){
+		*fUpCollOne = true;
+		//printf("\ncollision\n");
+	}
+	if(numUpSecond>1){
+		*fUpCollSecond = true;
+	}
+	selectionPrintf("(%d, %d, %d),", *downNode, *upNodeOne, *upNodeSecond);
+
+	if(numUpOne==1&&numUpSecond==1){
+		printf("\n(%d, %d, %d),\n", *downNode, *upNodeOne, *upNodeSecond);
 	}
 
 	free(proUp);
 	free(proDown);
 	free(proTempDown);
+	free(tempUp);
 
-	return minBackoff;
+	if(minBackoffOne<minBackoffSecond){
+		minMinBackoff = minBackoffOne;
+	}else{
+		minMinBackoff = minBackoffSecond;
+	}
+
+	return minMinBackoff;
 }

@@ -27,7 +27,8 @@ typedef struct staInformatioin{
 	int afterColl;
 	bool fSuccNow;
 	int afterSucc;
-	bool fTx;
+	bool fTxOne;
+	bool fTxSecond;
 	bool fRx;
 	long sumFrameLengthInBuffer;
 	double sumDelay;
