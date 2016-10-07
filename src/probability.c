@@ -239,7 +239,7 @@ int selectNode(apInfo *ap, staInfo sta[], bool *fUpCollOne, bool *fUpCollSecond,
 	int i, j, k;
 	int minBackoffOne = INT_MAX;
 	int minBackoffSecond = INT_MAX;
-	int minMinBackoff;
+	int maxMinBackoff;
 	int dummyNode = INT_MAX;
 	//int nodeIdRandom;
 	double *tempUp;
@@ -513,11 +513,11 @@ int selectNode(apInfo *ap, staInfo sta[], bool *fUpCollOne, bool *fUpCollSecond,
 	free(proTempDown);
 	free(tempUp);
 
-	if(minBackoffOne<minBackoffSecond){
-		minMinBackoff = minBackoffOne;
+	if(minBackoffOne>minBackoffSecond){
+		maxMinBackoff = minBackoffOne;
 	}else{
-		minMinBackoff = minBackoffSecond;
+		maxMinBackoff = minBackoffSecond;
 	}
 
-	return minMinBackoff;
+	return maxMinBackoff;
 }
