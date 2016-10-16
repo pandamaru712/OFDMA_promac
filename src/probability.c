@@ -27,15 +27,15 @@ extern double ub[(NUM_STA+1)*(NUM_STA+1)*(NUM_STA+1)];
 int powint(double x, double y){
 	double temp = pow(x, y);
 
-	return (int) temp;
+	return (int)temp;
 }
 
 void solveLP(){
 	int i, j, k;
 	int tate = NUM_STA * 2;
-	int yoko = pow(NUM_STA+1, 3);
-	//char buffer[EP_BUFFER_SIZE] = {'\0'};
-
+	int yoko = powint(NUM_STA+1, 3);
+	char buffer[EP_BUFFER_SIZE] = {'\0'};
+	printf("Start solveLP\n");
 	optimizationPrintf("Setting matrixes.\n");
 
 	mxArray *mx_p = NULL;
@@ -74,30 +74,45 @@ void solveLP(){
 	engPutVariable(gEp, "mx_lb", mx_lb);
 	engPutVariable(gEp, "mx_ub", mx_ub);
 
-	//engOutputBuffer(gEp, buffer, EP_BUFFER_SIZE);
-	//engEvalString(gEp, "mx_r");
-	//printf("%s", buffer);
-
+	engOutputBuffer(gEp, buffer, EP_BUFFER_SIZE);
+	/*engEvalString(gEp, "mx_r");
+	printf("%s", buffer);
+	engEvalString(gEp, "mx_A");
+	printf("%s", buffer);
+	engEvalString(gEp, "mx_u");
+	printf("%s", buffer);
+	engEvalString(gEp, "mx_Aeq");
+	printf("%s", buffer);
+	engEvalString(gEp, "mx_beq");
+	printf("%s", buffer);
+	engEvalString(gEp, "mx_lb");
+	printf("%s", buffer);
+	engEvalString(gEp, "mx_ub");
+	printf("%s", buffer);*/
+	printf("End setting matlab matricies\n");
 	optimizationPrintf("Optimization starts.\n");
 
-	engEvalString(gEp, "[p, fval] = linprog(mx_r, mx_A, mx_u, mx_Aeq, mx_beq, mx_lb, mx_ub);");
-	//printf("%s", buffer);
-	engEvalString(gEp, "p = p ./ 100;");
-	engEvalString(gEp, "fval = fval / (-100);");
-	//printf("%s", buffer);
+	engEvalString(gEp, "[p, fval] = linprog(mx_r, mx_A, mx_u, mx_Aeq, mx_beq, mx_lb, []);");
+	printf("End linprog\n");
+	printf("%s", buffer);
+	engEvalString(gEp, "p = p ./ 100");
+	engEvalString(gEp, "fval = fval / (-100)");
 	mx_p = engGetVariable(gEp, "p");
 	p = mxGetPr(mx_p);
 	mx_fval = engGetVariable(gEp, "fval");
 	fval = mxGetPr(mx_fval);
 
+	printf("Transform p[i] and pro[i][j][k]\n");
 	for(i=0; i<yoko; i++){
+		//printf("(%d, %d, %d)", (i%powint(NUM_STA+1,2))/(NUM_STA+1), (i%powint(NUM_STA+1,2))%(NUM_STA+1), i/powint(NUM_STA+1,2));
 		if(p[i]>=0.000001){
 			pro[(i%powint(NUM_STA+1,2))/(NUM_STA+1)][(i%powint(NUM_STA+1,2))%(NUM_STA+1)][i/powint(NUM_STA+1,2)] = p[i];
 		}else{
 			pro[(i%powint(NUM_STA+1,2))/(NUM_STA+1)][(i%powint(NUM_STA+1,2))%(NUM_STA+1)][i/powint(NUM_STA+1,2)] = 0;
 		}
-		probabilityPrintf("%f, ", p[i]);
+		//probabilityPrintf("%f, ", p[i]);
 	}
+	printf("End optimization\n");
 	probabilityPrintf("\n\n");
 	optimizationPrintf("Optimization terminated.\n");
 	probabilityPrintf("***** Probability *****\n");
@@ -251,6 +266,7 @@ int selectNode(apInfo *ap, staInfo sta[], bool *fUpCollOne, bool *fUpCollSecond,
 	initializeDoubleArray(proDown, NUM_STA+1, 0);
 	initializeDoubleArray(proUp, NUM_STA+1, 0);
 	initializeDoubleArray(proTempDown, NUM_STA+1, 0);
+	initializeDoubleArray(tempUp, NUM_STA+1, 0);
 
 	/*if(gSpec.proMode==6){
 		nodeIdRandom = rand() % (NUM_STA+1);
@@ -342,9 +358,10 @@ int selectNode(apInfo *ap, staInfo sta[], bool *fUpCollOne, bool *fUpCollSecond,
 
 	//上り通信端末の選択
 	selectionPrintf("***** Probabiliy that each node is selected as a source node of AP. *****\n");
+	selectionPrintf("Select STA j\n");
 	for(j=0; j<NUM_STA+1; j++){
 		for(k=0; k<NUM_STA+1; k++){
-			tempUp[j] = pro[*downNode][j][k];
+			tempUp[j] += pro[*downNode][j][k];
 		}
 	}
 	for(j=0; j<NUM_STA+1; j++){
@@ -353,7 +370,7 @@ int selectNode(apInfo *ap, staInfo sta[], bool *fUpCollOne, bool *fUpCollSecond,
 		}else{
 			proUp[j] = tempUp[j]/proDown[*downNode];
 			//if(proUp[j]<0.000001){
-				selectionPrintf("%f, %f ", tempUp[j], proDown[*downNode]);
+				selectionPrintf("%f, %f\n", tempUp[j], proDown[*downNode]);
 			//}*/
 		}
 		selectionPrintf("p_u[%d] is %f\n", j, proUp[j]);
@@ -371,10 +388,10 @@ int selectNode(apInfo *ap, staInfo sta[], bool *fUpCollOne, bool *fUpCollSecond,
 			}
 		}
 		if(i!=0){
-			selectionPrintf("%d, ", sta[i-1].cw);
+			selectionPrintf("sta[i-1].cw = %d\n", sta[i-1].cw);
 		}
 	}
-	selectionPrintf("%d, ", numUpOne);
+	selectionPrintf("numUpOne = %d\n", numUpOne);
 	selectionPrintf("\n\n");
 
 	bool emptyOne = true;
@@ -389,7 +406,7 @@ int selectNode(apInfo *ap, staInfo sta[], bool *fUpCollOne, bool *fUpCollSecond,
 			}
 		}
 	}
-	selectionPrintf("minBackoffOne %d, ", minBackoffOne);
+	selectionPrintf("minBackoffOne %d\n", minBackoffOne);
 	if(minBackoffOne==INT_MAX&&emptyOne==true){
 		printf("All STAs don't have a frame.(epmtyOne)\n");   //フレームが無いときだけじゃないかも ダミーが選ばれる場合も
 	}
@@ -400,9 +417,11 @@ int selectNode(apInfo *ap, staInfo sta[], bool *fUpCollOne, bool *fUpCollSecond,
 	}
 
 	//Select STA k
+	initializeDoubleArray(tempUp, NUM_STA+1, 0);
+	selectionPrintf("Select STA k\n");
 	for(k=0; k<NUM_STA+1; k++){
 		for(j=0; j<NUM_STA+1; j++){
-			tempUp[k] = pro[*downNode][j][k];
+			tempUp[k] += pro[*downNode][j][k];
 		}
 	}
 	for(k=0; k<NUM_STA+1; k++){
@@ -429,10 +448,10 @@ int selectNode(apInfo *ap, staInfo sta[], bool *fUpCollOne, bool *fUpCollSecond,
 			}
 		}
 		if(i!=0){
-			selectionPrintf("%d, ", sta[i-1].cw);
+			selectionPrintf("sta[i-1].cw = %d\n", sta[i-1].cw);
 		}
 	}
-	selectionPrintf("%d, ", numUpSecond);
+	selectionPrintf("numUpSecond = %d\n", numUpSecond);
 	selectionPrintf("\n\n");
 
 	bool emptySecond = true;
@@ -447,7 +466,7 @@ int selectNode(apInfo *ap, staInfo sta[], bool *fUpCollOne, bool *fUpCollSecond,
 			}
 		}
 	}
-	selectionPrintf("minBackoffSecond %d, ", minBackoffSecond);
+	selectionPrintf("minBackoffSecond %d\n", minBackoffSecond);
 	if(minBackoffSecond==INT_MAX&&emptySecond==true){
 		printf("All STAs don't have a frame.(emptySecond)\n");   //フレームが無いときだけじゃないかも ダミーが選ばれる場合も
 	}
@@ -486,9 +505,9 @@ int selectNode(apInfo *ap, staInfo sta[], bool *fUpCollOne, bool *fUpCollSecond,
 	selectionPrintf("numUpOne %d, numUpSecond %d\n", numUpOne, numUpSecond);
 
 	//ENDHALF:
-	if((numUpOne==0 && *fNoUpOne==false) || (numUpSecond==0 && *fNoUpSecond==false)){
+	/*if((numUpOne==0 && *fNoUpOne==false) || (numUpSecond==0 && *fNoUpSecond==false)){
 		printf("undefined\n");
-	}
+	}*/
 	if((numUpOne==0 && *fNoUpOne==true)||(numUpOne==1 && *fNoUpOne==false)){
 		*fUpCollOne = false;
 	}
@@ -513,6 +532,12 @@ int selectNode(apInfo *ap, staInfo sta[], bool *fUpCollOne, bool *fUpCollSecond,
 	free(proTempDown);
 	free(tempUp);
 
+	if(minBackoffOne==INT_MAX){
+		minBackoffOne = 0;
+	}
+	if(minBackoffSecond==INT_MAX){
+		minBackoffSecond = 0;
+	}
 	if(minBackoffOne>minBackoffSecond){
 		maxMinBackoff = minBackoffOne;
 	}else{

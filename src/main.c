@@ -3,6 +3,7 @@
 #include <string.h>
 #include <getopt.h>
 #include <unistd.h>
+#include <time.h>
 #include "nodeInfo.h"
 #include "setting.h"
 #include "initialization.h"
@@ -38,6 +39,9 @@ double ub[(NUM_STA+1)*(NUM_STA+1)*(NUM_STA+1)] = {};
 void showProgression(int*);
 
 int main(int argc, char *argv[]){
+	time_t start, end;
+	start = time(NULL);
+
 	//Check option values from command line.
 	//checkOption(argc, argv);
 	//Apply option values to simulation settings.
@@ -127,6 +131,9 @@ int main(int argc, char *argv[]){
 		fclose(gFileTopology);
 	}
 	printf("Close MATLAB.\nFinish.\n");
+
+	end = time(NULL);
+	printf("経過時間は%f\n", (double)(end-start));
 	return 0;
 }
 

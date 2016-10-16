@@ -11,7 +11,7 @@
 
 
 #define BUFFER_SIZE 200
-#define NUM_STA 3
+#define NUM_STA 50
 #define EP_BUFFER_SIZE 2048
 #define STR_MAX 256
 #define CONFIG_FILE "config.txt"

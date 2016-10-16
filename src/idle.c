@@ -22,12 +22,14 @@ int upContention(staInfo sta[], bool *fUpColl){
 	}else{
 		for(i=0; i<gSpec.numSta; i++){
 			if(minBackoff==sta[i].backoffCount){
-				sta[i].fTx = true;
+				sta[i].fTxOne = true;
+				sta[i].fTxSecond = false;
 				sta[i].backoffCount = rand() % (sta[i].cw + 1);
 				numTx++;
 			}else{
 				sta[i].backoffCount -= minBackoff;
-				sta[i].fTx = false;
+				sta[i].fTxOne = false;
+				sta[i].fTxSecond = false;
 			}
 		}
 	}
@@ -64,7 +66,8 @@ void idle(staInfo sta[], apInfo *ap, int *numTx, bool *fEmpty){
 				sta[i].backoffCount -= minBackoff;
 				if(sta[i].backoffCount==0){
 					(*numTx)++;
-					sta[i].fTx = true;
+					sta[i].fTxOne = true;
+					sta[i].fTxSecond = false;
 				}
 			}
 		}
@@ -95,7 +98,8 @@ void idle(staInfo sta[], apInfo *ap, int *numTx, bool *fEmpty){
 			sta[nodeID].buffer[0].lengthMsdu = traffic(isSta);
 			sta[nodeID].buffer[0].timeStamp = gElapsedTime + t;
 			sta[nodeID].sumFrameLengthInBuffer += sta[nodeID].buffer[0].lengthMsdu;
-			sta[nodeID].fTx = true;
+			sta[nodeID].fTxOne = true;
+			sta[nodeID].fTxSecond = false;
 			*numTx = 1;
 		}
 		gElapsedTime += t;

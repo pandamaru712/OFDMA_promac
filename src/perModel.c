@@ -63,6 +63,8 @@ void calculateRSSI(apInfo *ap, staInfo sta[], double delay[]){
 	double sinr_j, sinr_k;
 	double r_mat[NUM_STA+1][NUM_STA+1][NUM_STA+1] = {};
 	double txPower;
+
+	printf("calculateRSSI starts\n");
 	/*
 	if(isTxSta==false){
 		RSSI = ap->txPower + ap->antennaGain + sta->antennaGain - (30*log10(distance) + 47);
@@ -73,6 +75,7 @@ void calculateRSSI(apInfo *ap, staInfo sta[], double delay[]){
 		for(j=0; j<NUM_STA+1; j++){
 			for(k=0; k<NUM_STA+1; k++){
 			if(i==j||j==k||k==i){
+				//printf("");
 				r_mat[i][j][k] = 0;
 			}else if(j==0 && k==0 && i!=0){   //下りのみ
 				rssi = ap->txPower + ap->antennaGain + sta[i-1].antennaGain - (30*log10(distance(ap, sta, i, 0)) + 47);
@@ -389,18 +392,23 @@ void calculateRSSI(apInfo *ap, staInfo sta[], double delay[]){
 		}
 	}
 
+	printf("rate calculation ends\n");
 	ratePrintf("\n***** Rate Matrix *****\n");
 	for(i=0;i<NUM_STA+1;i++){
 		for(j=0;j<NUM_STA+1;j++){
 			for(k=0;k<NUM_STA+1;k++){
+				//printf("(%d, %d, %d)\n", i, j, k);
 				r[(NUM_STA+1)*(NUM_STA+1)*k+i*(NUM_STA+1)+j] = -r_mat[i][j][k];
-				ratePrintf("%f, ", r[i*(NUM_STA+1)+j]);
+				ratePrintf("%f, ", r[(NUM_STA+1)*(NUM_STA+1)*k+i*(NUM_STA+1)+j]);
 			}
 			ratePrintf("\n");
 		}
 		ratePrintf("\n");
 	}
 	ratePrintf("***** Rate Matrix *****\n\n");
+
+	printf("calculateRSSI ends");
+	printf("really?");
 }
 
 void calculateDelay(apInfo *ap, staInfo sta[], double delay[]){
