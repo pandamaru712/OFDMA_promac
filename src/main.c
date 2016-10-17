@@ -35,6 +35,7 @@ double Aeq[2][(NUM_STA+1)*(NUM_STA+1)*(NUM_STA+1)];
 double beq[2] = {100, 0};
 double lb[(NUM_STA+1)*(NUM_STA+1)*(NUM_STA+1)] = {};
 double ub[(NUM_STA+1)*(NUM_STA+1)*(NUM_STA+1)] = {};
+double distance[NUM_STA+1][NUM_STA+1] = {};
 
 void showProgression(int*);
 
@@ -109,6 +110,7 @@ int main(int argc, char *argv[]){
 		fEmpty = false;
 		lastBeacon = 0;
 		initializeNodeInfo(sta, &ap);
+		calculateDistance(&ap, sta);
 		gElapsedTime = gStd.difs;
 		initializeMatrix();
 		printf("Initialization NodeInfo and Matrix.\n");

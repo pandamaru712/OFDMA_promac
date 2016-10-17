@@ -102,9 +102,9 @@ void simulationResult(staInfo sta[], apInfo *ap, resultInfo *result, int trialID
 		printf("送信機会のFairness indexは%f \n", result->oppJFI / gSpec.numTrial);
 		printf("待機時間のFairness indexは%f \n", result->dlyJFI / gSpec.numTrial);
 		printf("スループットのFairness indexは%f \n", result->thrJFI / gSpec.numTrial);
+		printf("**********\n");
 		if(gSpec.fOutput==true){
-			fprintf(gSpec.output, "\n");
-
+			fprintf(gSpec.output, "\n***** Result *****\n");
 			fprintf(gSpec.output, "STA1台あたりのスループットは%f Mbit/s\n", result->aveStaThroughput / gSpec.numTrial);
 			fprintf(gSpec.output, "APのスループットは%f Mbit/s\n", result->apThroughput / gSpec.numTrial);
 			fprintf(gSpec.output, "システムスループットは%f Mbit/s\n", result->aveThroughput / gSpec.numTrial);
