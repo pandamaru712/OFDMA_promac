@@ -5,6 +5,7 @@
 #include "setting.h"
 #include "nodeInfo.h"
 
+int powint(double, double);
 int selectNode(apInfo*, staInfo*, bool*, bool*, bool*, bool*, bool*, int*, int*, int*);
 void calculateProbability(staInfo*, apInfo*);
 void initializeMatrix(void);

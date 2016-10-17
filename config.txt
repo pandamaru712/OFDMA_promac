@@ -7,7 +7,7 @@ output default %出力ファイル
 area 100
 delayPower 0.3
 position 3
-optMode 1
+optMode 0
 giveU 0.5 %与える値
 dNode 5
 rateMode 1

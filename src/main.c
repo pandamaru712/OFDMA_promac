@@ -38,6 +38,24 @@ double ub[(NUM_STA+1)*(NUM_STA+1)*(NUM_STA+1)] = {};
 
 void showProgression(int*);
 
+/*void defineArrays(void){
+	r = (double *)malloc(sizeof(double)*powint(NUM_STA+1, 3));
+	initializeDoubleArray(r, powint(NUM_STA+1, 3), 0);
+	u = (double *)malloc(sizeof(double)*NUM_STA*2);
+	initializeDoubleArray(u, NUM_STA*2, 0);
+	lb = (double *)malloc(sizeof(double)*powint(NUM_STA+1, 3));
+	initializeDoubleArray(lb, powint(NUM_STA+1, 3), 0);
+	ub = (double *)malloc(sizeof(double)*powint(NUM_STA+1, 3));
+	initializeDoubleArray(ub, powint(NUM_STA+1, 3), 0);
+}
+
+void freeArrays(void){
+	free(r);
+	free(u);
+	free(lb);
+	free(ub);
+}*/
+
 int main(int argc, char *argv[]){
 	time_t start, end;
 	start = time(NULL);
@@ -56,6 +74,7 @@ int main(int argc, char *argv[]){
 
 	staInfo *sta;
 	sta = (staInfo *)malloc(sizeof(staInfo)*gSpec.numSta);
+	//defineArrays();
 
 	//sta = (staInfo*)malloc(sizeof(staInfo)*gSpec.numSta);
 	apInfo ap;
@@ -123,6 +142,7 @@ int main(int argc, char *argv[]){
 	}
 	//fclose(gFileSta);
 	free(sta);
+	//freeArrays();
 	printf("Free memory space.\n");
 
 	engEvalString(gEp, "close;");

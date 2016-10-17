@@ -89,7 +89,7 @@ void solveLP(){
 	printf("%s", buffer);
 	engEvalString(gEp, "mx_ub");
 	printf("%s", buffer);*/
-	printf("End setting matlab matricies\n");
+	printf("End setting matlab matrices\n");
 	optimizationPrintf("Optimization starts.\n");
 
 	engEvalString(gEp, "[p, fval] = linprog(mx_r, mx_A, mx_u, mx_Aeq, mx_beq, mx_lb, []);");
@@ -262,6 +262,7 @@ int selectNode(apInfo *ap, staInfo sta[], bool *fUpCollOne, bool *fUpCollSecond,
 	int numUpOne = 0;
 	int numUpSecond = 0;
 
+	printf("Start selectNode\n");
 	//配列の初期化
 	initializeDoubleArray(proDown, NUM_STA+1, 0);
 	initializeDoubleArray(proUp, NUM_STA+1, 0);
@@ -388,11 +389,11 @@ int selectNode(apInfo *ap, staInfo sta[], bool *fUpCollOne, bool *fUpCollSecond,
 			}
 		}
 		if(i!=0){
-			selectionPrintf("sta[i-1].cw = %d\n", sta[i-1].cw);
+			selectionPrintf("sta[%d].cw = %d\n", i-1,  sta[i-1].cw);
 		}
 	}
-	selectionPrintf("numUpOne = %d\n", numUpOne);
-	selectionPrintf("\n\n");
+	//selectionPrintf("numUpOne = %d\n", numUpOne);
+	//selectionPrintf("\n\n");
 
 	bool emptyOne = true;
 
@@ -414,6 +415,17 @@ int selectNode(apInfo *ap, staInfo sta[], bool *fUpCollOne, bool *fUpCollSecond,
 		minBackoffOne = dummyNode;
 		*upNodeOne = 0;
 		*fNoUpOne = true;
+	}else{
+		for(i=0; i<NUM_STA; i++){
+			if(proUp[i+1]!=0 && sta[i].backoffCount==minBackoffOne && sta[i].fRx==false){
+				sta[i].fTxOne = true;
+				numUpOne++;
+				*upNodeOne = i+1;
+				*fNoUpOne = false;
+			}else{
+				sta[i].fTxOne = false;
+			}
+		}
 	}
 
 	//Select STA k
@@ -451,8 +463,8 @@ int selectNode(apInfo *ap, staInfo sta[], bool *fUpCollOne, bool *fUpCollSecond,
 			selectionPrintf("sta[i-1].cw = %d\n", sta[i-1].cw);
 		}
 	}
-	selectionPrintf("numUpSecond = %d\n", numUpSecond);
-	selectionPrintf("\n\n");
+	//selectionPrintf("numUpSecond = %d\n", numUpSecond);
+	//selectionPrintf("\n\n");
 
 	bool emptySecond = true;
 
@@ -474,9 +486,20 @@ int selectNode(apInfo *ap, staInfo sta[], bool *fUpCollOne, bool *fUpCollSecond,
 		minBackoffSecond = dummyNode;
 		*upNodeSecond = 0;
 		*fNoUpSecond = true;
+	}else{
+		for(i=0; i<NUM_STA; i++){
+			if(proUp[i+1]!=0 && sta[i].backoffCount==minBackoffSecond && sta[i].fRx==false){
+				sta[i].fTxSecond = true;
+				numUpSecond++;
+				*upNodeSecond = i+1;
+				*fNoUpSecond = false;
+			}else{
+				sta[i].fTxSecond = false;
+			}
+		}
 	}
 
-	if(*upNodeOne==0 && *upNodeSecond==0){
+	/*if(*upNodeOne==0 && *upNodeSecond==0){
 		calculatePhyRate(ap, sta, upNodeOne, upNodeSecond, downNode);
 	}else{
 		for(i=0; i<gSpec.numSta; i++){
@@ -499,9 +522,8 @@ int selectNode(apInfo *ap, staInfo sta[], bool *fUpCollOne, bool *fUpCollSecond,
 				sta[i].fTxOne = false;
 				sta[i].fTxSecond = false;
 			}
-		}
-		calculatePhyRate(ap, sta, upNodeOne, upNodeSecond, downNode);
-	}
+		}*/
+	calculatePhyRate(ap, sta, upNodeOne, upNodeSecond, downNode);
 	selectionPrintf("numUpOne %d, numUpSecond %d\n", numUpOne, numUpSecond);
 
 	//ENDHALF:
@@ -543,6 +565,8 @@ int selectNode(apInfo *ap, staInfo sta[], bool *fUpCollOne, bool *fUpCollSecond,
 	}else{
 		maxMinBackoff = minBackoffSecond;
 	}
+
+	printf("end selectNode\n");
 
 	return maxMinBackoff;
 }
