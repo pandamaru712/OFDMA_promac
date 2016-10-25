@@ -42,6 +42,8 @@ void simSetting(int argc, char **argv){
 	char name[256] = {'\0'};
    time_t timer;
    struct tm *timeptr;
+	timer = time(NULL);
+	timeptr = localtime(&timer);
 
 	gSpec.fDebug = false;
 	gSpec.simTime = 1;   //sec
@@ -141,8 +143,6 @@ void simSetting(int argc, char **argv){
 				gSpec.fOutput = true;
 				strcpy(gSpec.filename, optarg);
 				if(!strncmp(gSpec.filename, "default", strlen("default"))){
-					timer = time(NULL);
-    				timeptr = localtime(&timer);
     				strftime(name, 256, "%m-%d-%H-%M-%S", timeptr);
 					sprintf(gSpec.filename, "data/%s.txt", name);
 				}
