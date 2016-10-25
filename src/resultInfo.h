@@ -24,6 +24,10 @@ typedef struct resultInformation{
 	double aveTimeOptimization;
 	double totalTimeOptimization;
 	double totalTimeSimulation;
+	double proHalfDuplex;
+	double proFullDuplex;
+	double proOFDMA;
+	double proOFDMAandFullduplex;
 }resultInfo;
 
 #endif

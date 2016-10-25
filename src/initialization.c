@@ -32,6 +32,10 @@ void initializeResult(resultInfo *result){
 	result->totalTimeOptimization = 0;
 	result->totalNumOptimization = 0;
 	result->totalTimeSimulation = 0;
+	result->proHalfDuplex = 0;
+	result->proFullDuplex = 0;
+	result->proOFDMA = 0;
+	result->proOFDMAandFullduplex = 0;
 }
 
 void initializeNodeInfo(staInfo sta[], apInfo* ap){

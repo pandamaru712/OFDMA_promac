@@ -15,6 +15,10 @@
 
 extern int gNumOptimization;
 extern double gTotalTimeOptimization;
+extern int gNumHalfDuplex;
+extern int gNumFullDuplex;
+extern int gNumOFDMA;
+extern int gNumOFDMAandFullDuplex;
 extern Engine *gEp;
 extern double r[(NUM_STA+1)*(NUM_STA+1)*(NUM_STA+1)];
 extern double pro[NUM_STA+1][NUM_STA+1][NUM_STA+1];
@@ -559,6 +563,32 @@ int selectNode(apInfo *ap, staInfo sta[], bool *fUpCollOne, bool *fUpCollSecond,
 
 	if(numUpOne==1&&numUpSecond==1){
 		ratePrintf("\n(%d, %d, %d),\n", *downNode, *upNodeOne, *upNodeSecond);
+	}
+
+	if(*downNode!=0&&*upNodeOne==0&&*upNodeSecond==0){
+		gNumHalfDuplex++;
+	}else if(*downNode==0&&*upNodeOne!=0&&*upNodeSecond==0){
+		gNumHalfDuplex++;
+	}else if(*downNode==0&&*upNodeOne==0&&*upNodeSecond!=0){
+		gNumHalfDuplex++;
+	}else if(*downNode!=0&&*upNodeOne!=0&&*upNodeSecond==0){
+		gNumFullDuplex++;
+	}else if(*downNode!=0&&*upNodeOne==0&&*upNodeSecond!=0){
+		gNumFullDuplex++;
+	}else if(*downNode==0&&*upNodeOne!=0&&*upNodeSecond!=0){
+		if(*upNodeOne==*upNodeSecond){
+			gNumHalfDuplex++;
+		}else{
+			gNumOFDMA++;
+		}
+	}else if(*downNode!=0&&*upNodeOne!=0&&*upNodeSecond!=0){
+		if(*upNodeOne==*upNodeSecond){
+			gNumFullDuplex++;
+		}else{
+			gNumOFDMAandFullDuplex++;
+		}
+	}else{
+		printf("Selection error\n");
 	}
 
 	free(proUp);
