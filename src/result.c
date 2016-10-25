@@ -6,6 +6,9 @@
 
 extern double gElapsedTime;
 extern simSpec gSpec;
+extern int gNumOptimization;
+extern double gTotalTimeOptimization;
+extern double gTimeSimulation;
 
 void simulationResult(staInfo sta[], apInfo *ap, resultInfo *result, int trialID){
 	int i;
@@ -68,6 +71,11 @@ void simulationResult(staInfo sta[], apInfo *ap, resultInfo *result, int trialID
 	result->proColl += (double)gSpec.coll / gSpec.chance;
 	result->aveTotalTime += (double)gSpec.sumTotalTime / gSpec.chance;
 
+	result->totalNumOptimization += gNumOptimization;
+	result->totalTimeOptimization += gTotalTimeOptimization;
+	result->aveTimeOptimization += gTotalTimeOptimization / gNumOptimization;
+	result->totalTimeSimulation += gTimeSimulation;
+
 	for(i=0; i<NUM_STA; i++){
 		opp += pow(sta[i].numTxFrame, 2);
 		thr += pow(sta[i].byteSuccFrame * 8 / gElapsedTime, 2);
@@ -102,9 +110,11 @@ void simulationResult(staInfo sta[], apInfo *ap, resultInfo *result, int trialID
 		printf("送信機会のFairness indexは%f \n", result->oppJFI / gSpec.numTrial);
 		printf("待機時間のFairness indexは%f \n", result->dlyJFI / gSpec.numTrial);
 		printf("スループットのFairness indexは%f \n", result->thrJFI / gSpec.numTrial);
+		printf("総最適化回数は%d，総最適化時間は%f秒，平均所要時間は%f秒\n", result->totalNumOptimization, result->totalTimeOptimization, result->aveTimeOptimization/gSpec.numTrial);
+		printf("試行回数は%d，総シミュレーション時間は%f秒，平均%f秒\n", gSpec.numTrial, result->totalTimeSimulation, result->totalTimeSimulation/gSpec.numTrial);
+		printf("**********\n");
 		if(gSpec.fOutput==true){
-			fprintf(gSpec.output, "\n");
-
+			fprintf(gSpec.output, "\n***** Result *****\n");
 			fprintf(gSpec.output, "STA1台あたりのスループットは%f Mbit/s\n", result->aveStaThroughput / gSpec.numTrial);
 			fprintf(gSpec.output, "APのスループットは%f Mbit/s\n", result->apThroughput / gSpec.numTrial);
 			fprintf(gSpec.output, "システムスループットは%f Mbit/s\n", result->aveThroughput / gSpec.numTrial);
@@ -114,7 +124,8 @@ void simulationResult(staInfo sta[], apInfo *ap, resultInfo *result, int trialID
 			fprintf(gSpec.output, "STAの平均遅延は%f us\n", result->aveStaDelay / gSpec.numTrial);
 			fprintf(gSpec.output, "APの遅延は%f us\n", result->apDelay / gSpec.numTrial);
 			fprintf(gSpec.output, "システムの平均遅延は%f us\n", result->aveDelay / gSpec.numTrial);
-
+			fprintf(gSpec.output, "総最適化回数は%d，総最適化時間は%f秒，平均所要時間は%f秒\n", result->totalNumOptimization, result->totalTimeOptimization, result->aveTimeOptimization/gSpec.numTrial);
+			fprintf(gSpec.output, "試行回数は%d，総シミュレーション時間は%f秒，平均%f秒\n", gSpec.numTrial, result->totalTimeSimulation, result->totalTimeSimulation/gSpec.numTrial);
 			fprintf(gSpec.output, "**********\n\n\n");
 		}
 	}

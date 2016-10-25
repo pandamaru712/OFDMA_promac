@@ -28,6 +28,10 @@ void initializeResult(resultInfo *result){
 	result->thrJFI = 0;
 	result->oppJFI = 0;
 	result->dlyJFI = 0;
+	result->aveTimeOptimization = 0;
+	result->totalTimeOptimization = 0;
+	result->totalNumOptimization = 0;
+	result->totalTimeSimulation = 0;
 }
 
 void initializeNodeInfo(staInfo sta[], apInfo* ap){

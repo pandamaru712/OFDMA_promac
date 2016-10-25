@@ -3,7 +3,7 @@
 #include <string.h>
 #include <getopt.h>
 #include <unistd.h>
-#include <time.h>
+#include <sys/time.h>
 #include "nodeInfo.h"
 #include "setting.h"
 #include "initialization.h"
@@ -18,6 +18,9 @@
 #include "matrix.h"
 #include "tmwtypes.h"
 
+int gNumOptimization;
+double gTotalTimeOptimization;
+double gTimeSimulation;
 double gElapsedTime;
 std11 gStd;
 simSpec gSpec;
@@ -35,6 +38,7 @@ double Aeq[2][(NUM_STA+1)*(NUM_STA+1)*(NUM_STA+1)];
 double beq[2] = {100, 0};
 double lb[(NUM_STA+1)*(NUM_STA+1)*(NUM_STA+1)] = {};
 double ub[(NUM_STA+1)*(NUM_STA+1)*(NUM_STA+1)] = {};
+double distance[NUM_STA+1][NUM_STA+1] = {};
 
 void showProgression(int*);
 
@@ -57,8 +61,7 @@ void freeArrays(void){
 }*/
 
 int main(int argc, char *argv[]){
-	time_t start, end;
-	start = time(NULL);
+	struct timeval start, end;
 
 	//Check option values from command line.
 	//checkOption(argc, argv);
@@ -103,13 +106,18 @@ int main(int argc, char *argv[]){
 	printf("Open MATLAB engine.\n");
 
 	for (trialID=0; trialID<gSpec.numTrial; trialID++){
+		gettimeofday(&start, NULL);
 		printf("\n***** %d/%d *****\n", trialID+1, gSpec.numTrial);
-		srand(9);
+		srand(trialID);
 		numTx = 0;
 		fEmpty = false;
 		lastBeacon = 0;
 		initializeNodeInfo(sta, &ap);
+		calculateDistance(&ap, sta);
 		gElapsedTime = gStd.difs;
+		gNumOptimization = 0;
+		gTotalTimeOptimization = 0;
+		gTimeSimulation = 0;
 		initializeMatrix();
 		printf("Initialization NodeInfo and Matrix.\n");
 		if(gSpec.proMode!=6 && gSpec.proMode!=7){
@@ -128,12 +136,13 @@ int main(int argc, char *argv[]){
 				}
 				lastBeacon = gElapsedTime;
 			}
-			printf("%f\n", gElapsedTime);
+			processPrintf("%f\n", gElapsedTime);
 			#ifdef PROGRESS
 				showProgression(&previousCount);
 			#endif
 		}
-
+		gettimeofday(&end, NULL);
+		gTimeSimulation = (double)(end.tv_sec - start.tv_sec) + (double)(end.tv_usec - start.tv_usec) / 1000000;
 		simulationResult(sta, &ap, &result, trialID);
 	}
 
@@ -151,9 +160,6 @@ int main(int argc, char *argv[]){
 		fclose(gFileTopology);
 	}
 	printf("Close MATLAB.\nFinish.\n");
-
-	end = time(NULL);
-	printf("経過時間は%f\n", (double)(end-start));
 	return 0;
 }
 

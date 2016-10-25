@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <string.h>
+#include <sys/time.h>
 //#include "probability.h"
 #include "perModel.h"
 #include "engine.h"
@@ -12,6 +13,8 @@
 #include "nodeInfo.h"
 #include "Initialization.h"
 
+extern int gNumOptimization;
+extern double gTotalTimeOptimization;
 extern Engine *gEp;
 extern double r[(NUM_STA+1)*(NUM_STA+1)*(NUM_STA+1)];
 extern double pro[NUM_STA+1][NUM_STA+1][NUM_STA+1];
@@ -35,7 +38,12 @@ void solveLP(){
 	int tate = NUM_STA * 2;
 	int yoko = powint(NUM_STA+1, 3);
 	char buffer[EP_BUFFER_SIZE] = {'\0'};
-	printf("Start solveLP\n");
+
+	struct timeval start, end;
+	gettimeofday(&start, NULL);
+	gNumOptimization++;
+
+	processPrintf("Start solveLP\n");
 	optimizationPrintf("Setting matrixes.\n");
 
 	mxArray *mx_p = NULL;
@@ -89,12 +97,12 @@ void solveLP(){
 	printf("%s", buffer);
 	engEvalString(gEp, "mx_ub");
 	printf("%s", buffer);*/
-	printf("End setting matlab matrices\n");
+	processPrintf("End setting matlab matrices\n");
 	optimizationPrintf("Optimization starts.\n");
 
-	engEvalString(gEp, "[p, fval] = linprog(mx_r, mx_A, mx_u, mx_Aeq, mx_beq, mx_lb, []);");
-	printf("End linprog\n");
-	printf("%s", buffer);
+	engEvalString(gEp, "[p, fval] = linprog(mx_r, mx_A, mx_u, mx_Aeq, mx_beq, mx_lb, mx_ub);");
+	processPrintf("End linprog\n");
+	optimizationPrintf("%s", buffer);
 	engEvalString(gEp, "p = p ./ 100");
 	engEvalString(gEp, "fval = fval / (-100)");
 	mx_p = engGetVariable(gEp, "p");
@@ -102,7 +110,7 @@ void solveLP(){
 	mx_fval = engGetVariable(gEp, "fval");
 	fval = mxGetPr(mx_fval);
 
-	printf("Transform p[i] and pro[i][j][k]\n");
+	processPrintf("Transform p[i] and pro[i][j][k]\n");
 	for(i=0; i<yoko; i++){
 		//printf("(%d, %d, %d)", (i%powint(NUM_STA+1,2))/(NUM_STA+1), (i%powint(NUM_STA+1,2))%(NUM_STA+1), i/powint(NUM_STA+1,2));
 		if(p[i]>=0.000001){
@@ -112,7 +120,7 @@ void solveLP(){
 		}
 		//probabilityPrintf("%f, ", p[i]);
 	}
-	printf("End optimization\n");
+	processPrintf("End optimization\n");
 	probabilityPrintf("\n\n");
 	optimizationPrintf("Optimization terminated.\n");
 	probabilityPrintf("***** Probability *****\n");
@@ -146,6 +154,10 @@ void solveLP(){
 	mxDestroyArray(mx_p);
 	mxDestroyArray(mx_fval);
 	//engEvalString(gEp, "close;");
+
+	gettimeofday(&end, NULL);
+	//printf("%d\n", end.tv_usec);
+	gTotalTimeOptimization += (double)(end.tv_sec - start.tv_sec) + (double)(end.tv_usec - start.tv_usec) / 1000000;
 }
 
 void calculateProbability(staInfo sta[], apInfo *ap){
@@ -262,7 +274,7 @@ int selectNode(apInfo *ap, staInfo sta[], bool *fUpCollOne, bool *fUpCollSecond,
 	int numUpOne = 0;
 	int numUpSecond = 0;
 
-	printf("Start selectNode\n");
+	processPrintf("Start selectNode\n");
 	//配列の初期化
 	initializeDoubleArray(proDown, NUM_STA+1, 0);
 	initializeDoubleArray(proUp, NUM_STA+1, 0);
@@ -546,7 +558,7 @@ int selectNode(apInfo *ap, staInfo sta[], bool *fUpCollOne, bool *fUpCollSecond,
 	selectionPrintf("(%d, %d, %d),", *downNode, *upNodeOne, *upNodeSecond);
 
 	if(numUpOne==1&&numUpSecond==1){
-		printf("\n(%d, %d, %d),\n", *downNode, *upNodeOne, *upNodeSecond);
+		ratePrintf("\n(%d, %d, %d),\n", *downNode, *upNodeOne, *upNodeSecond);
 	}
 
 	free(proUp);
@@ -566,7 +578,7 @@ int selectNode(apInfo *ap, staInfo sta[], bool *fUpCollOne, bool *fUpCollSecond,
 		maxMinBackoff = minBackoffSecond;
 	}
 
-	printf("end selectNode\n");
+	processPrintf("end selectNode\n");
 
 	return maxMinBackoff;
 }
