@@ -156,7 +156,8 @@ void solveLP(){
 	//engEvalString(gEp, "close;");
 
 	gettimeofday(&end, NULL);
-	gTotalTimeOptimization += end.tv_sec - start.tv_sec + (end.tv_usec - start.tv_usec) / 1000000;
+	//printf("%d\n", end.tv_usec);
+	gTotalTimeOptimization += (double)(end.tv_sec - start.tv_sec) + (double)(end.tv_usec - start.tv_usec) / 1000000;
 }
 
 void calculateProbability(staInfo sta[], apInfo *ap){

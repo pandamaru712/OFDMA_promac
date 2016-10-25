@@ -142,7 +142,7 @@ int main(int argc, char *argv[]){
 			#endif
 		}
 		gettimeofday(&end, NULL);
-		gTimeSimulation = end.tv_sec - start.tv_sec + (end.tv_usec - start.tv_usec)/1000000;
+		gTimeSimulation = (double)(end.tv_sec - start.tv_sec) + (double)(end.tv_usec - start.tv_usec) / 1000000;
 		simulationResult(sta, &ap, &result, trialID);
 	}
 
