@@ -130,7 +130,20 @@ void initializeNodeInfo(staInfo sta[], apInfo* ap){
 			sta[i].x = tempX;
 			sta[i].y = tempY;
 		}
-		positionPrintf("%f, %f\n", sta[i].x, sta[i].y);
+		if(sta[i].x>0){
+			if(sta[i].y>0){
+				sta[i].pos = 1;
+			}else{
+				sta[i].pos = 4;
+			}
+		}else{
+			if(sta[i].y>0){
+				sta[i].pos = 2;
+			}else{
+				sta[i].pos = 3;
+			}
+		}
+		positionPrintf("%f, %f, pos %d\n", sta[i].x, sta[i].y, sta[i].pos);
 		sta[i].distanceAp = sqrt(pow(sta[i].x, 2)+pow(sta[i].y, 2));
 		sta[i].txPower = 20.0;   //dBm
 		sta[i].antennaGain = 2.0;   //dBi

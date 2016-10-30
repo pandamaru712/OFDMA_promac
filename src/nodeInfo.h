@@ -40,6 +40,7 @@ typedef struct staInformatioin{
 	double timeNextFrame;
 	double distanceAp;
 	double dataRate;
+	int pos;
 }staInfo;
 
 typedef struct apInformation{

@@ -161,6 +161,7 @@ void solveLP(){
 
 	gettimeofday(&end, NULL);
 	//printf("%d\n", end.tv_usec);
+	//printf("%f\n", (double)(end.tv_sec - start.tv_sec) + (double)(end.tv_usec - start.tv_usec) / 1000000);
 	gTotalTimeOptimization += (double)(end.tv_sec - start.tv_sec) + (double)(end.tv_usec - start.tv_usec) / 1000000;
 }
 
