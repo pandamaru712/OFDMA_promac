@@ -1,11 +1,11 @@
 delayMode 1 #How to calculate delay time.
 simTime 10
-trafficPattern 1
+trafficPattern 0
 trial 1
 lambdaSta 0.1
 output default %出力ファイル
 area 100
-delayPower 0.3
+delayPower 0.0
 position 1
 optMode 0
 giveU 0.5 %与える値

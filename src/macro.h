@@ -7,7 +7,7 @@
 //#define SHOW_RATE
 //#define SHOW_SELECTION
 //#define SHOW_MATRIX
-#define SHOW_POSITION
+//#define SHOW_POSITION
 
 
 #define BUFFER_SIZE 200

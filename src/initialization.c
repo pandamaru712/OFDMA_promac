@@ -33,7 +33,9 @@ void initializeResult(resultInfo *result){
 	result->totalNumOptimization = 0;
 	result->totalTimeSimulation = 0;
 	result->proHalfDuplex = 0;
-	result->proFullDuplex = 0;
+	result->proFullDuplex_J = 0;
+	result->proFullDuplex_K = 0;
+	result->proFullDuplex_J_K = 0;
 	result->proOFDMA = 0;
 	result->proOFDMAandFullduplex = 0;
 }

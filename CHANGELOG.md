@@ -1,5 +1,14 @@
 ## Change Log
 
+### upcoming (2016/10/31 02:11 +09:00)
+- [9fe53cb](https://github.com/pandamaru712/OFDMA_promac/commit/9fe53cbaa7d5f07069499f6215f305bf93e723b0) Get position areas and protocol probability
+- [150ce1d](https://github.com/pandamaru712/OFDMA_promac/commit/150ce1d1fcd5bb4d9167b84e987346df43e025b0) Probability of each transmission mode
+- [c9c9b48](https://github.com/pandamaru712/OFDMA_promac/commit/c9c9b48734ea29cb090f276b194a9e1adb22a31d) Merge branch 'optimize'
+- [e7a282b](https://github.com/pandamaru712/OFDMA_promac/commit/e7a282b65b921ec5a56da6a58839919fccb77575) Commit for checkout
+- [59b92dd](https://github.com/pandamaru712/OFDMA_promac/commit/59b92dd463d46091a5f118bf5533dd1cb4803d40) Fix bug about time measurement
+- [da3c2f4](https://github.com/pandamaru712/OFDMA_promac/commit/da3c2f4dca1e1bb0a1dc120e81270ff2acdf9ea8) Implement time measurement and fix some bugs
+- [e3ff229](https://github.com/pandamaru712/OFDMA_promac/commit/e3ff22971c42f16f5e889d4739b826fe90e17068) Implement calculateDistance function
+
 ### v1.0.0 (2016/10/18 02:49 +09:00)
 - [6b62d36](https://github.com/pandamaru712/OFDMA_promac/commit/6b62d365edf1a840cd0e15e2471d32b7d2961b45) Many bag fix
 - [d023851](https://github.com/pandamaru712/OFDMA_promac/commit/d02385149a932969b2bfd7c69cad1e5a009ea27d) commit before big changes

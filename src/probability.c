@@ -16,7 +16,9 @@
 extern int gNumOptimization;
 extern double gTotalTimeOptimization;
 extern int gNumHalfDuplex;
-extern int gNumFullDuplex;
+extern int gNumFullDuplex_J;
+extern int gNumFullDuplex_K;
+extern int gNumFullDuplex_J_K;
 extern int gNumOFDMA;
 extern int gNumOFDMAandFullDuplex;
 extern Engine *gEp;
@@ -343,6 +345,7 @@ int selectNode(apInfo *ap, staInfo sta[], bool *fUpCollOne, bool *fUpCollSecond,
 		}
 		if(i==NUM_STA){
 			printf("Error. downRand = %f\n", downRand);
+			exit(654);
 			*downNode = 0;
 			*fNoDownlink = true;
 		}
@@ -447,6 +450,7 @@ int selectNode(apInfo *ap, staInfo sta[], bool *fUpCollOne, bool *fUpCollSecond,
 
 	//Select STA k
 	initializeDoubleArray(tempUp, NUM_STA+1, 0);
+	dummyNode = INT_MAX;
 	selectionPrintf("Select STA k\n");
 	for(k=0; k<NUM_STA+1; k++){
 		for(j=0; j<NUM_STA+1; j++){
@@ -573,9 +577,9 @@ int selectNode(apInfo *ap, staInfo sta[], bool *fUpCollOne, bool *fUpCollSecond,
 	}else if(*downNode==0&&*upNodeOne==0&&*upNodeSecond!=0){
 		gNumHalfDuplex++;
 	}else if(*downNode!=0&&*upNodeOne!=0&&*upNodeSecond==0){
-		gNumFullDuplex++;
+		gNumFullDuplex_J++;
 	}else if(*downNode!=0&&*upNodeOne==0&&*upNodeSecond!=0){
-		gNumFullDuplex++;
+		gNumFullDuplex_K++;
 	}else if(*downNode==0&&*upNodeOne!=0&&*upNodeSecond!=0){
 		if(*upNodeOne==*upNodeSecond){
 			gNumHalfDuplex++;
@@ -584,7 +588,7 @@ int selectNode(apInfo *ap, staInfo sta[], bool *fUpCollOne, bool *fUpCollSecond,
 		}
 	}else if(*downNode!=0&&*upNodeOne!=0&&*upNodeSecond!=0){
 		if(*upNodeOne==*upNodeSecond){
-			gNumFullDuplex++;
+			gNumFullDuplex_J_K++;
 		}else{
 			gNumOFDMAandFullDuplex++;
 		}
